@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PDF 無損壓縮小幫手</title>
+<style>
+:root{--canvas:#fff3dc;--paper:#fff;--powder:#ffe7c7;--powder-soft:#fff9ed;--sky:#86d8ec;--sky-soft:#e6f8fb;--indigo:#8c79d9;--indigo-soft:#eee9ff;--primary:#cc4352;--primary-dark:#a93645;--primary-soft:#ffe2e3;--green:#23856b;--green-soft:#e3f7ef;--amber:#9a6400;--amber-soft:#fff0bd;--orange:#f28c52;--yellow:#f7c948;--ink:#463544;--soft-ink:#665566;--muted:#887584;--line:#ead8cc;--glass:rgba(255,255,255,.86);--shadow:0 22px 60px rgba(142,88,70,.16);--shadow-soft:0 12px 28px rgba(142,88,70,.11)}
+*{box-sizing:border-box}input,select,textarea{max-width:100%}
+body{margin:0;min-height:100vh;font-family:"Arial Rounded MT Bold","Noto Sans TC","Microsoft JhengHei",system-ui,sans-serif;color:var(--ink);background:radial-gradient(circle at 8% 10%,rgba(247,201,72,.38),transparent 25%),radial-gradient(circle at 92% 12%,rgba(242,140,82,.26),transparent 28%),radial-gradient(circle at 52% 96%,rgba(89,195,165,.22),transparent 32%),linear-gradient(135deg,#fff0d2 0%,#fff9ed 48%,#ffe8dc 100%);background-attachment:fixed}
+.container{width:min(1080px,calc(100% - 30px));margin:auto;padding:26px 0 54px}
+.topbar{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:13px 18px;border-radius:999px;background:var(--glass);border:2px solid #fff;box-shadow:var(--shadow-soft);margin-bottom:24px}
+.brand{display:flex;align-items:center;gap:12px;font-weight:950}.logo{width:42px;height:42px;border-radius:16px;display:grid;place-items:center;color:#fff;background:linear-gradient(135deg,var(--primary-dark),var(--primary));box-shadow:0 12px 24px #cc435240;transform:rotate(-5deg);font-size:22px}
+.topnote{color:var(--muted);font-size:13px;font-weight:800}
+.hero{display:grid;grid-template-columns:1.08fr .92fr;gap:20px;margin-bottom:22px}
+.hero-card{position:relative;overflow:hidden;min-height:310px;padding:clamp(25px,4vw,46px);border-radius:36px;background:linear-gradient(135deg,rgba(255,255,255,.94),rgba(255,255,255,.68)),linear-gradient(135deg,#f7c94840,#f28c5233,#59c3a52e);border:2px solid #fff;box-shadow:var(--shadow)}
+.hero-card:before{content:"";position:absolute;width:180px;height:180px;right:-55px;top:-65px;border-radius:50%;background:linear-gradient(135deg,var(--yellow),var(--orange));opacity:.65}.hero-card:after{content:"";position:absolute;width:120px;height:120px;left:-42px;bottom:-45px;border-radius:50%;background:linear-gradient(135deg,var(--green-soft),var(--sky));opacity:.8}
+.hero-content{position:relative;z-index:1}.label{display:inline-flex;padding:8px 14px;border-radius:999px;background:var(--amber-soft);color:var(--amber);font-size:13px;font-weight:950;margin-bottom:18px}
+h1{margin:0;font-size:clamp(34px,5vw,56px);line-height:1.18;letter-spacing:.02em}.accent{background:linear-gradient(90deg,var(--primary-dark),var(--primary),var(--orange));-webkit-background-clip:text;background-clip:text;color:transparent}
+.hero p{color:var(--soft-ink);line-height:1.85;font-size:16px;max-width:560px;margin:17px 0 0}
+.side{display:grid;gap:15px}.info-card{padding:22px;border-radius:30px;background:rgba(255,255,255,.82);border:1px solid #ffffffeb;box-shadow:var(--shadow-soft)}.info-card.sunny{background:linear-gradient(135deg,#fff0bded,#ffffffc9)}.info-head{display:flex;justify-content:space-between;align-items:center;gap:12px}.sun{width:66px;height:66px;flex:0 0 auto;border-radius:50%;display:grid;place-items:center;background:radial-gradient(circle at 35% 35%,#fff7ad,#facc15 58%,#fb923c);font-size:36px;box-shadow:0 12px 25px #facc154d}.info-card h2{margin:0;font-size:21px}.info-card p{margin:8px 0 0;color:var(--soft-ink);line-height:1.7;font-size:14px}
+.section{padding:25px;border-radius:32px;background:var(--glass);border:2px solid #ffffffeb;box-shadow:var(--shadow-soft);margin-bottom:20px;backdrop-filter:blur(14px)}.section h2{margin:0;font-size:25px}.desc{margin:7px 0 18px;color:var(--soft-ink);line-height:1.7}
+.dropzone{border:2px dashed #e4b8a7;border-radius:25px;background:var(--powder-soft);padding:30px 18px;text-align:center;cursor:pointer;transition:.2s}.dropzone.drag{border-color:var(--primary);background:var(--primary-soft)}.drop-icon{font-size:42px}.dropzone strong{display:block;font-size:18px;margin:8px 0}.dropzone span{color:var(--muted);font-size:14px}.file-input{position:absolute;width:1px;height:1px;opacity:0;pointer-events:none}
+.file-row{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-top:14px;padding:13px 15px;border-radius:18px;background:#fff;border:1px solid var(--line)}.file-meta{min-width:0}.file-meta b{display:block;overflow-wrap:anywhere}.file-meta small{color:var(--muted)}
+.actions{display:flex;gap:11px;flex-wrap:wrap;margin-top:18px}.btn{border:0;border-radius:999px;padding:13px 20px;font:inherit;font-size:15px;font-weight:950;cursor:pointer;transition:transform .2s,filter .2s}.btn:hover{transform:translateY(-2px);filter:brightness(1.04)}.btn:focus-visible,.dropzone:focus-visible{outline:3px solid #cc435255;outline-offset:3px}.btn.primary{color:#fff;background:linear-gradient(135deg,var(--primary),var(--primary-dark));box-shadow:0 13px 25px #cc43523d}.btn.light{color:var(--primary-dark);background:var(--primary-soft)}.btn:disabled{opacity:.48;cursor:not-allowed;transform:none}
+.status{display:none;margin-top:16px;padding:14px 16px;border-radius:18px;background:var(--sky-soft);color:#176779;line-height:1.65;font-weight:800}.status.show{display:block}.status.error{background:var(--red-soft);color:#9d2945}.status.success{background:var(--green-soft);color:var(--green)}.progress{height:11px;background:#f2dfd4;border-radius:99px;overflow:hidden;margin-top:12px}.progress span{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--primary-dark),var(--primary),var(--orange),var(--yellow));transition:width .25s}
+.result-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:16px}.metric{padding:16px;border-radius:20px;background:#fff;border:1px solid var(--line)}.metric span{display:block;color:var(--muted);font-size:13px;font-weight:800}.metric b{display:block;font-size:23px;margin-top:5px;overflow-wrap:anywhere}
+.tip{padding:15px 17px;border-radius:19px;background:var(--amber-soft);color:#765000;line-height:1.75;font-size:14px}.footer{text-align:center;color:var(--muted);font-size:13px;line-height:1.8;padding:8px 12px}
+@media(max-width:850px){.hero{grid-template-columns:1fr}.hero-card{min-height:260px}.side{grid-template-columns:1fr 1fr}}
+@media(max-width:620px){.container{width:calc(100% - 18px);padding-top:14px}.topbar{border-radius:23px;padding:12px}.topnote{display:none}.hero-card{border-radius:27px;padding:25px 21px}.section{padding:18px;border-radius:25px}.side{grid-template-columns:1fr}.result-grid{grid-template-columns:1fr}.actions .btn{width:100%}.dropzone{padding:24px 12px}}
+@media(prefers-reduced-motion:reduce){*,*:before,*:after{scroll-behavior:auto!important;transition:none!important}}
+</style>
+</head>
+<body>
+<main class="container">
+  <nav class="topbar"><div class="brand"><div class="logo">PDF</div><span>PDF 無損壓縮小幫手</span></div><div class="topnote">🔒 檔案只在你的瀏覽器中處理</div></nav>
+  <section class="hero">
+    <div class="hero-card"><div class="hero-content"><div class="label">🌟 LOSSLESS PDF OPTIMIZER</div><h1>讓 PDF 更精簡<br><span class="accent">保留原始畫質</span></h1><p>整理 PDF 結構並重新壓縮可無損處理的文件串流。不會刻意降低圖片解析度，也不會把頁面轉成圖片。</p></div></div>
+    <aside class="side">
+      <div class="info-card sunny"><div class="info-head"><div><h2>☀️ 品質優先</h2><p>不使用圖片降解析度或 JPEG 有損重編碼。檔案是否縮小，取決於原始 PDF 的結構。</p></div><div class="sun">✨</div></div></div>
+      <div class="info-card"><h2>🛡️ 隱私小提醒</h2><p>選取的 PDF 會在本機瀏覽器記憶體中處理，不會上傳到壓縮服務。首次使用需要連線載入壓縮引擎。</p></div>
+    </aside>
+  </section>
+  <section class="section">
+    <h2>📂 一、選擇 PDF 檔案</h2><p class="desc">選擇一份 PDF，或將檔案拖曳到下方區域。建議先保留原始檔案備份。</p>
+    <input class="file-input" id="pdfFile" type="file" accept="application/pdf,.pdf">
+    <div class="dropzone" id="dropzone" role="button" tabindex="0" aria-label="選擇 PDF 檔案"><div class="drop-icon">📄</div><strong>點擊選擇，或把 PDF 拖曳到這裡</strong><span>目前一次處理一份 PDF</span></div>
+    <div id="fileRow" class="file-row" hidden><div class="file-meta"><b id="fileName">尚未選擇檔案</b><small id="fileSize"></small></div><button class="btn light" id="removeBtn" type="button">移除</button></div>
+    <div class="actions"><button class="btn primary" id="compressBtn" type="button" disabled>🚀 開始無損壓縮</button><button class="btn light" id="resetBtn" type="button">↻ 重設</button></div>
+    <div id="status" class="status" role="status" aria-live="polite"></div>
+    <div id="progress" class="progress" hidden><span id="progressBar"></span></div>
+    <div id="result" hidden><div class="result-grid"><div class="metric"><span>原始大小</span><b id="originalSize">—</b></div><div class="metric"><span>處理後大小</span><b id="newSize">—</b></div><div class="metric"><span>檔案變化</span><b id="saving">—</b></div></div><div class="actions"><button class="btn primary" id="downloadBtn" type="button">⬇️ 下載處理後 PDF</button></div></div>
+  </section>
+  <section class="section"><h2>💡 二、壓縮方式與注意事項</h2><p class="desc">本工具使用 QPDF WebAssembly 在瀏覽器內整理 PDF 結構。</p><div class="tip">🌈 <b>無損的意思：</b>不重新取樣圖片、不把頁面點陣化，並重新壓縮可處理的資料串流。這不代表檔案一定會變小；如果原檔已經最佳化，結果可能差不多，甚至稍大。含有特殊表單、數位簽章或加密限制的 PDF，重新寫入後也可能影響其特殊功能；重要文件請務必檢查輸出檔。</div></section>
+  <div class="footer">單檔 HTML｜不需安裝桌面程式｜首次載入壓縮引擎需網路<br>PDF 內容不會傳送至本工具以外的伺服器。</div>
+</main>
+<script>
+// PDF 引擎使用 QPDF WebAssembly；首次開啟需連線下載 JS 與 WASM，之後瀏覽器可能快取。
+const ENGINE_JS='https://unpkg.com/@neslinesli93/qpdf-wasm@0.3.0/dist/qpdf.js';
+const ENGINE_WASM='https://unpkg.com/@neslinesli93/qpdf-wasm@0.3.0/dist/qpdf.wasm';
+const $=id=>document.getElementById(id);
+let selectedFile=null,enginePromise=null,engine=null,outputBlob=null,outputName='compressed.pdf',busy=false;
+const fmt=n=>{if(!Number.isFinite(n))return '—';const units=['B','KB','MB','GB'];let i=0;while(n>=1024&&i<units.length-1){n/=1024;i++;}return `${n.toFixed(i?2:0)} ${units[i]}`;};
+function showStatus(message,type=''){const el=$('status');el.textContent=message;el.className='status show'+(type?' '+type:'');}
+function clearStatus(){ $('status').className='status';$('status').textContent=''; }
+function resetResult(){outputBlob=null;$('result').hidden=true;$('progress').hidden=true;$('progressBar').style.width='0%';}
+function setFile(file){if(!file)return;if(!/\.pdf$/i.test(file.name)&&file.type!=='application/pdf'){showStatus('檔案格式不正確，請選擇 PDF 檔案。','error');return;}selectedFile=file;$('fileName').textContent=file.name;$('fileSize').textContent=fmt(file.size);$('fileRow').hidden=false;$('compressBtn').disabled=false;resetResult();clearStatus();}
+function removeFile(){selectedFile=null;$('pdfFile').value='';$('fileRow').hidden=true;$('compressBtn').disabled=true;resetResult();clearStatus();}
+$('dropzone').addEventListener('click',()=>$('pdfFile').click());$('dropzone').addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();$('pdfFile').click();}});
+$('pdfFile').addEventListener('change',e=>setFile(e.target.files[0]));$('removeBtn').addEventListener('click',removeFile);
+['dragenter','dragover'].forEach(ev=>$('dropzone').addEventListener(ev,e=>{e.preventDefault();$('dropzone').classList.add('drag');}));
+['dragleave','drop'].forEach(ev=>$('dropzone').addEventListener(ev,e=>{e.preventDefault();$('dropzone').classList.remove('drag');}));
+$('dropzone').addEventListener('drop',e=>setFile(e.dataTransfer.files[0]));
+async function loadEngine(){if(engine)return engine;if(enginePromise)return enginePromise;enginePromise=new Promise((resolve,reject)=>{let settled=false;const fail=msg=>{if(!settled){settled=true;reject(new Error(msg));}};
+  // Emscripten 會讀取 window.Module 的設定，並在 WASM 執行環境就緒後呼叫回呼。
+  window.Module={noInitialRun:true,locateFile:()=>ENGINE_WASM,onRuntimeInitialized(){if(!settled){settled=true;resolve(window.Module);}},printErr:(...args)=>console.warn('[QPDF]',...args)};
+  const script=document.createElement('script');script.src=ENGINE_JS;script.async=true;script.onload=()=>{setTimeout(()=>{if(!settled&&window.Module&&window.Module.FS&&window.Module.callMain){settled=true;resolve(window.Module);}},0);};script.onerror=()=>fail('無法載入 PDF 壓縮引擎。請確認網路連線，或稍後再試。');document.head.appendChild(script);
+});try{engine=await enginePromise;return engine;}catch(err){enginePromise=null;throw err;}}
+function cleanVirtualFile(fs,path){try{if(fs.analyzePath(path).exists)fs.unlink(path);}catch(_){}}
+async function compress(){if(busy||!selectedFile)return;busy=true;$('compressBtn').disabled=true;$('resetBtn').disabled=true;$('progress').hidden=false;$('progressBar').style.width='12%';resetResult();$('progress').hidden=false;$('progressBar').style.width='12%';
+ try{
+  showStatus('正在載入壓縮引擎…首次使用需要下載約數 MB 的 WebAssembly 元件。');
+  const q=await loadEngine();$('progressBar').style.width='38%';showStatus('正在讀取 PDF 並進行無損結構最佳化…');
+  const bytes=new Uint8Array(await selectedFile.arrayBuffer());if(bytes.length<5||new TextDecoder().decode(bytes.slice(0,5))!=='%PDF-')throw new Error('檔案內容不像有效的 PDF，請重新選擇。');
+  const inputPath='/pdf_input_'+Date.now()+'.pdf',outputPath='/pdf_output_'+Date.now()+'.pdf';
+  q.FS.writeFile(inputPath,bytes);
+  $('progressBar').style.width='55%';
+  // 不使用 --optimize-images，避免以 JPEG 等有損方式替換圖片。
+  const code=q.callMain(['--compress-streams=y','--decode-level=generalized','--recompress-flate','--compression-level=9','--object-streams=generate',inputPath,outputPath]);
+  $('progressBar').style.width='85%';
+  let out;try{out=q.FS.readFile(outputPath);}catch(_){throw new Error('壓縮引擎未產生輸出檔。可能是 PDF 加密、格式受限或檔案損毀。');}
+  if(!out||!out.length)throw new Error('輸出 PDF 是空檔，已取消下載。');
+  outputBlob=new Blob([out],{type:'application/pdf'});outputName=(selectedFile.name.replace(/\.pdf$/i,'')||'document')+'_lossless.pdf';
+  $('originalSize').textContent=fmt(selectedFile.size);$('newSize').textContent=fmt(out.length);
+  const diff=selectedFile.size-out.length;const pct=selectedFile.size?Math.abs(diff)/selectedFile.size*100:0;
+  $('saving').textContent=diff>0?`減少 ${pct.toFixed(1)}%`:diff<0?`增加 ${pct.toFixed(1)}%`:'大小不變';
+  $('result').hidden=false;$('progressBar').style.width='100%';
+  if(diff>0)showStatus(`完成！檔案減少 ${fmt(diff)}。請下載並確認文件內容與特殊功能正常。`,'success');
+  else showStatus('處理完成，但檔案沒有變小（可能略為增加）。這份 PDF 原本可能已經壓縮良好；本工具不會為了縮小檔案而犧牲圖片畫質。','success');
+  cleanVirtualFile(q.FS,inputPath);cleanVirtualFile(q.FS,outputPath);
+  // qpdf 可能以非零狀態回報警告；只要輸出檔有效，仍提供檢查與下載。
+  if(code!==0)console.warn('QPDF exit code:',code);
+ }catch(err){console.error(err);showStatus(err.message||'處理失敗，請確認 PDF 是否有效後再試。','error');}
+ finally{busy=false;$('compressBtn').disabled=!selectedFile;$('resetBtn').disabled=false;}
+}
+$('compressBtn').addEventListener('click',compress);
+$('downloadBtn').addEventListener('click',()=>{if(!outputBlob)return;const url=URL.createObjectURL(outputBlob);const a=document.createElement('a');a.href=url;a.download=outputName;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1500);});
+$('resetBtn').addEventListener('click',()=>{if(busy)return;removeFile();$('progress').hidden=true;$('progressBar').style.width='0%';});
+</script>
+</body>
+</html>
